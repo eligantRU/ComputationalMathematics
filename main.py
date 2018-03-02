@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 VELOCITY_PRECISION = 0.1
 ROBOT_MASS = 100
-V0 = 0
+START_VELOCITY = 0
 MAX_TIME = 400
 DELTA_TIME = 1
 
@@ -32,7 +32,7 @@ def cruise_control(proportional_factor, integral_factor=0.1, resist_factor=RESIS
     min_force = -max_force
     t = ind * DELTA_TIME
     error_sum = 0
-    v = [V0]
+    v = [START_VELOCITY]
     for i in range(MAX_TIME):
         err = cruise_speed - v[i]
         error_sum += err

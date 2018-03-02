@@ -64,9 +64,9 @@ plt.ylabel("Velocity, m/s", fontsize=14)
 plt.show()
 
 
-def get_no_error_time(data_frame, cruise_speed, VELOCITY_PRECISION):
+def get_no_error_time(data_frame, cruise_speed, velocity_precision):
     i = len(data_frame) - 1
-    while (abs(cruise_speed - data_frame.v[i]) < VELOCITY_PRECISION) & (i > 1):
+    while (abs(cruise_speed - data_frame.v[i]) < velocity_precision) & (i > 1):
         i -= 1
     return data_frame.index[i]
 

@@ -114,7 +114,7 @@ def get_convergence_rate(v, cruise_speed, p):
     i = 0
     while v[i] < (cruise_speed - 0.1):
         i += 1
-    vf.append(v[i])
+        vf.append(v[i])
     numv = len(vf)
     istep = list(range(numv)) * len(p)
     for n in range(len(p)):

@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# TODO: use template strings to show constants
+# TODO: use template strings or string.format to show constants
 
 VELOCITY_PRECISION = 0.1
 ROBOT_MASS = 100

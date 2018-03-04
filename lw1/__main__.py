@@ -56,7 +56,8 @@ def execute_with_limit_time(origin_res, res):
     ax.plot(a3, "k--", color="green")
     ax.plot([limit_time1, limit_time1], [CRUISE_VELOCITY - 4, CRUISE_VELOCITY + 4], color="brown")
     plt.title("Velocity changing(proportional_factor={proportional_factor}, integral_factor={integral_factor})"
-              .format(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR), fontsize=TITLE_FONT_SIZE)
+              .format(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR),
+              fontsize=TITLE_FONT_SIZE)
     plt.xlabel("Time, s", fontsize=FONT_SIZE)
     plt.ylabel("Velocity, m/s", fontsize=FONT_SIZE)
     plt.show()

@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from include.utils import *
+from lw1.include.utils import *
 
 
 TITLE_FONT_SIZE = 16

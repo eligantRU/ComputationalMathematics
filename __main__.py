@@ -65,11 +65,11 @@ def estimate_convergence_rate(res):
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(convergence_rate_frame.istep[1: b], convergence_rate_frame.cc[1:b], color="red")
-    ax.plot(convergence_rate_frame.istep[b + 1: b + b], convergence_rate_frame.cc[b + 1: b + b], "k--", color="green")
-    ax.plot(convergence_rate_frame.istep[b + b + 1:], convergence_rate_frame.cc[b + b + 1:], "k.", color="brown")
+    ax.plot(convergence_rate_frame.step[1: b], convergence_rate_frame.cc[1:b], color="red")
+    ax.plot(convergence_rate_frame.step[b + 1: b + b], convergence_rate_frame.cc[b + 1: b + b], "k--", color="green")
+    ax.plot(convergence_rate_frame.step[b + b + 1:], convergence_rate_frame.cc[b + b + 1:], "k.", color="brown")
     plt.title("Estimation of the order and speed of convergence", fontsize=16)
-    plt.xlabel("istep", fontsize=14)
+    plt.xlabel("step", fontsize=14)
     plt.ylabel("cc", fontsize=14)
     plt.show()
 

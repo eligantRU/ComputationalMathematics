@@ -2,9 +2,7 @@ import matplotlib.pyplot as plt
 from include.utils import *
 
 
-def main():
-    res = cruise_control(proportional_factor=ORIGINAL_PROPORTIONAL_FACTOR, integral_factor=ORIGINAL_INTEGRAL_FACTOR)
-
+def execute_origin(res):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(res)
@@ -19,10 +17,9 @@ def main():
     plt.ylabel("Velocity, m/s", fontsize=14)
     plt.show()
 
-    ###
 
+def execute_origin_with_limit_time(res):
     limit_time = get_no_error_time(res)
-
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(res[50:])
@@ -40,19 +37,18 @@ def main():
     plt.ylabel("Velocity, m/s", fontsize=14)
     plt.show()
 
-    ###
 
-    res1 = cruise_control(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR)
-    limit_time1 = get_no_error_time(res1)
+def execute_with_limit_time(origin_res, res):
+    limit_time1 = get_no_error_time(res)
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(res1[50:])
-    a1 = pd.Series(CRUISE_VELOCITY, index=res.index[50:])
+    ax.plot(res[50:])
+    a1 = pd.Series(CRUISE_VELOCITY, index=origin_res.index[50:])
     ax.plot(a1, color="red")
-    a2 = pd.Series(CRUISE_VELOCITY - 2 * VELOCITY_PRECISION, index=res.index[50:])
+    a2 = pd.Series(CRUISE_VELOCITY - 2 * VELOCITY_PRECISION, index=origin_res.index[50:])
     ax.plot(a2, "k--", color="green")
-    a3 = pd.Series(CRUISE_VELOCITY + 2 * VELOCITY_PRECISION, index=res.index[50:])
+    a3 = pd.Series(CRUISE_VELOCITY + 2 * VELOCITY_PRECISION, index=origin_res.index[50:])
     ax.plot(a3, "k--", color="green")
     ax.plot([limit_time1, limit_time1], [CRUISE_VELOCITY - 4, CRUISE_VELOCITY + 4], color="brown")
     plt.title("Velocity changing: proportional_factor={proportional_factor}, integral_factor={integral_factor}"
@@ -61,10 +57,10 @@ def main():
     plt.ylabel("Velocity, m/s", fontsize=14)
     plt.show()
 
-    ###
 
+def estimate_convergence_rate(res):
     c = [1., 1.1, 1.2]
-    convergence_rate_frame = get_convergence_rate(res1.v, c)
+    convergence_rate_frame = get_convergence_rate(res.v, c)
     b = int(len(convergence_rate_frame) / len(c))
 
     fig = plt.figure()
@@ -78,8 +74,19 @@ def main():
     plt.show()
 
     order = [1.05]
-    convergence_rate_frame = get_convergence_rate(res1.v, order)
+    convergence_rate_frame = get_convergence_rate(res.v, order)
     print("velocity = ", 1 / convergence_rate_frame.cc.mean())
+
+
+def main():
+    origin_res = cruise_control(proportional_factor=ORIGINAL_PROPORTIONAL_FACTOR,
+                                integral_factor=ORIGINAL_INTEGRAL_FACTOR)
+    res = cruise_control(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR)
+
+    execute_origin(origin_res)
+    execute_origin_with_limit_time(origin_res)
+    execute_with_limit_time(origin_res, res)
+    estimate_convergence_rate(res)
 
 
 if __name__ == "__main__":

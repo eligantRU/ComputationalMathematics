@@ -80,7 +80,7 @@ def estimate_convergence_rate(res):
 
     order = [1.05]
     convergence_rate_frame = get_convergence_rate(res.v, order)
-    print("velocity = ", 1 / convergence_rate_frame.cc.mean())
+    print("velocity =", 1 / convergence_rate_frame.cc.mean())
 
 
 def main():

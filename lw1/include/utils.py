@@ -52,7 +52,7 @@ def get_convergence_rate(v, p):
         i += 1
         vf.append(v[i])
     numv = len(vf)
-    istep = list(range(numv)) * len(p)
+    step = list(range(numv)) * len(p)
     for n in range(len(p)):
         for m in range(numv):
             pf.append(p[n])
@@ -60,7 +60,7 @@ def get_convergence_rate(v, p):
     for i in range(1, len(vf)):
         cc.append(abs(CRUISE_VELOCITY - vf[i]) / abs(CRUISE_VELOCITY - vf[i - 1])**pf[i])
     return pd.DataFrame({
-        "step": pd.Series(istep),
+        "step": pd.Series(step),
         "cc": pd.Series(cc),
         "pf": pd.Series(pf)
     })

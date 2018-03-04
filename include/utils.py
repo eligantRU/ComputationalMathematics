@@ -21,7 +21,7 @@ def clamp(minimum, x, maximum):
     return max(minimum, min(x, maximum))
 
 
-def cruise_control(proportional_factor, integral_factor=0.1):
+def cruise_control(proportional_factor, integral_factor):
     ind = list(range(MAX_TIME))
     t = ind * DELTA_TIME
     error_sum = 0

@@ -2,6 +2,10 @@ import matplotlib.pyplot as plt
 from include.utils import *
 
 
+TITLE_FONT_SIZE = 16
+FONT_SIZE = 14
+
+
 def execute_origin(res):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -12,9 +16,9 @@ def execute_origin(res):
     ax.plot(a2, "k--", color="green")
     a3 = pd.Series(CRUISE_VELOCITY + 10 * VELOCITY_PRECISION, index=res.index)
     ax.plot(a3, "k--", color="green")
-    plt.title("Velocity changing", fontsize=16)
-    plt.xlabel("Time, s", fontsize=14)
-    plt.ylabel("Velocity, m/s", fontsize=14)
+    plt.title("Velocity changing", fontsize=TITLE_FONT_SIZE)
+    plt.xlabel("Time, s", fontsize=FONT_SIZE)
+    plt.ylabel("Velocity, m/s", fontsize=FONT_SIZE)
     plt.show()
 
 
@@ -30,11 +34,11 @@ def execute_origin_with_limit_time(res):
     a3 = pd.Series(CRUISE_VELOCITY + 2 * VELOCITY_PRECISION, index=res.index[50:])
     ax.plot(a3, "k--", color="green")
     ax.plot([limit_time, limit_time], [CRUISE_VELOCITY - 10, CRUISE_VELOCITY + 10], color="brown")
-    plt.title("Velocity changing: proportional_factor={proportional_factor}, integral_factor={integral_factor}"
+    plt.title("Velocity changing(proportional_factor={proportional_factor}, integral_factor={integral_factor})"
               .format(proportional_factor=ORIGINAL_PROPORTIONAL_FACTOR, integral_factor=ORIGINAL_INTEGRAL_FACTOR),
-              fontsize=16)
-    plt.xlabel("Time, s", fontsize=14)
-    plt.ylabel("Velocity, m/s", fontsize=14)
+              fontsize=TITLE_FONT_SIZE)
+    plt.xlabel("Time, s", fontsize=FONT_SIZE)
+    plt.ylabel("Velocity, m/s", fontsize=FONT_SIZE)
     plt.show()
 
 
@@ -51,10 +55,10 @@ def execute_with_limit_time(origin_res, res):
     a3 = pd.Series(CRUISE_VELOCITY + 2 * VELOCITY_PRECISION, index=origin_res.index[50:])
     ax.plot(a3, "k--", color="green")
     ax.plot([limit_time1, limit_time1], [CRUISE_VELOCITY - 4, CRUISE_VELOCITY + 4], color="brown")
-    plt.title("Velocity changing: proportional_factor={proportional_factor}, integral_factor={integral_factor}"
-              .format(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR), fontsize=16)
-    plt.xlabel("Time, s", fontsize=14)
-    plt.ylabel("Velocity, m/s", fontsize=14)
+    plt.title("Velocity changing(proportional_factor={proportional_factor}, integral_factor={integral_factor})"
+              .format(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR), fontsize=TITLE_FONT_SIZE)
+    plt.xlabel("Time, s", fontsize=FONT_SIZE)
+    plt.ylabel("Velocity, m/s", fontsize=FONT_SIZE)
     plt.show()
 
 
@@ -68,9 +72,9 @@ def estimate_convergence_rate(res):
     ax.plot(convergence_rate_frame.step[1: b], convergence_rate_frame.cc[1:b], color="red")
     ax.plot(convergence_rate_frame.step[b + 1: b + b], convergence_rate_frame.cc[b + 1: b + b], "k--", color="green")
     ax.plot(convergence_rate_frame.step[b + b + 1:], convergence_rate_frame.cc[b + b + 1:], "k.", color="brown")
-    plt.title("Estimation of the order and speed of convergence", fontsize=16)
-    plt.xlabel("step", fontsize=14)
-    plt.ylabel("cc", fontsize=14)
+    plt.title("Estimation of the order and speed of convergence", fontsize=TITLE_FONT_SIZE)
+    plt.xlabel("step", fontsize=FONT_SIZE)
+    plt.ylabel("convergence rate", fontsize=FONT_SIZE)
     plt.show()
 
     order = [1.05]

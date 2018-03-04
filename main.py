@@ -2,8 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# TODO: use template strings or string.format to show constants
-
 VELOCITY_PRECISION = 0.1
 ROBOT_MASS = 100
 START_VELOCITY = 0
@@ -18,7 +16,7 @@ ORIGINAL_PROPORTIONAL_FACTOR = 3
 ORIGINAL_INTEGRAL_FACTOR = 0.3
 
 PROPORTIONAL_FACTOR = 3
-INTEGRAL_FACTOR = 0.3
+INTEGRAL_FACTOR = 0.1
 
 
 def clamp(minimum, x, maximum):
@@ -36,12 +34,12 @@ def cruise_control(proportional_factor, integral_factor=0.1):
         force = proportional_factor * err + integral_factor * error_sum * DELTA_TIME
         force = clamp(-MAX_FORCE, force, MAX_FORCE)
         v.append(v[i] + (force - RESIST_FACTOR * v[i]) * DELTA_TIME / ROBOT_MASS)
-    df_tv = pd.DataFrame(v[:MAX_TIME], index=t, columns=["v"])
+    df_tv = pd.DataFrame(v[: MAX_TIME], index=t, columns=["v"])
     df_tv.index.name = "T"
     return df_tv
 
 
-res = cruise_control(proportional_factor=3, integral_factor=0.2)
+res = cruise_control(proportional_factor=ORIGINAL_PROPORTIONAL_FACTOR, integral_factor=ORIGINAL_INTEGRAL_FACTOR)
 
 plt.rcParams["font.fantasy"] = "Arial", "Times New Roman", "Tahoma", "Comic Sans MS", "Courier"
 plt.rcParams["font.family"] = "fantasy"
@@ -79,12 +77,14 @@ ax.plot(a2, "k--", color="green")
 a3 = pd.Series(CRUISE_VELOCITY + 2 * VELOCITY_PRECISION, index=res.index[50:])
 ax.plot(a3, "k--", color="green")
 ax.plot([limit_time, limit_time], [CRUISE_VELOCITY - 10, CRUISE_VELOCITY + 10], color="brown")
-plt.title("Velocity changing: proportional_factor=3, integral_factor=0.2", fontsize=16)
+plt.title("Velocity changing: proportional_factor={proportional_factor}, integral_factor={integral_factor}"
+          .format(proportional_factor=ORIGINAL_PROPORTIONAL_FACTOR, integral_factor=ORIGINAL_INTEGRAL_FACTOR),
+          fontsize=16)
 plt.xlabel("Time, s", fontsize=14)
 plt.ylabel("Velocity, m/s", fontsize=14)
 plt.show()
 
-res1 = cruise_control(proportional_factor=3, integral_factor=0.1)
+res1 = cruise_control(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR)
 limit_time1 = get_no_error_time(res1)
 
 fig = plt.figure()
@@ -97,7 +97,8 @@ ax.plot(a2, "k--", color="green")
 a3 = pd.Series(CRUISE_VELOCITY + 2 * VELOCITY_PRECISION, index=res.index[50:])
 ax.plot(a3, "k--", color="green")
 ax.plot([limit_time1, limit_time1], [CRUISE_VELOCITY - 4, CRUISE_VELOCITY + 4], color="brown")
-plt.title("Velocity changing: proportional_factor=3, integral_factor=0.1", fontsize=16)
+plt.title("Velocity changing: proportional_factor={proportional_factor}, integral_factor={integral_factor}"
+          .format(proportional_factor=PROPORTIONAL_FACTOR, integral_factor=INTEGRAL_FACTOR), fontsize=16)
 plt.xlabel("Time, s", fontsize=14)
 plt.ylabel("Velocity, m/s", fontsize=14)
 plt.show()
@@ -117,7 +118,7 @@ def get_convergence_rate(v, p):
             pf.append(p[n])
     vf = vf * len(p)
     for i in range(1, len(vf)):
-        cc.append(abs(CRUISE_VELOCITY - vf[i]) / abs(CRUISE_VELOCITY - vf[i-1])**pf[i])
+        cc.append(abs(CRUISE_VELOCITY - vf[i]) / abs(CRUISE_VELOCITY - vf[i - 1])**pf[i])
     return pd.DataFrame({
         "istep": pd.Series(istep),
         "cc": pd.Series(cc),
@@ -131,7 +132,7 @@ b = int(len(convergence_rate_frame) / len(c))
 
 fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
-ax.plot(convergence_rate_frame.istep[1:b], convergence_rate_frame.cc[1:b], color="red")
+ax.plot(convergence_rate_frame.istep[1: b], convergence_rate_frame.cc[1:b], color="red")
 ax.plot(convergence_rate_frame.istep[b + 1: b + b], convergence_rate_frame.cc[b + 1: b + b], "k--", color="green")
 ax.plot(convergence_rate_frame.istep[b + b + 1:], convergence_rate_frame.cc[b + b + 1:], "k.", color="brown")
 plt.title("Estimation of the order and speed of convergence", fontsize=16)

@@ -73,7 +73,8 @@ def get_convergence_rate(path, last_point, order):
         cc.append(1.)
         for ix in range(1, steps_number):
             cc.append(
-                calculate_quadratic_norm(last_point - path[:][ix]) / calculate_quadratic_norm(last_point - path[:][ix-1])**pf[i]
+                calculate_quadratic_norm(last_point - path[:][ix])
+                / calculate_quadratic_norm(last_point - path[:][ix-1])**pf[i]
             )
             i += 1
     return pd.DataFrame({

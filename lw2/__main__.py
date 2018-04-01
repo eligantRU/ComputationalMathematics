@@ -14,24 +14,27 @@ LINEAR_VELOCITY_PROPORTIONAL_FACTOR = 0.5
 ANGULAR_VELOCITY_PROPORTIONAL_FACTOR = 2
 
 
-def calculate_path(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, iteration_step_factor,
-                   speed_reduction_shift=0.5, precision=0.1, max_iterations_number=50):
-    xtr = pd.Series(x0)
-    xtr = pd.DataFrame(xtr, index=xtr.index)
+def calculate_path(start_position, linear_velocity_proportional_factor, angular_velocity_proportional_factor,
+                   iteration_step_factor, speed_reduction_shift=0.5, precision=0.1, max_iterations_number=50):
+    path = pd.Series(start_position)
+    path = pd.DataFrame(path, index=path.index)
     i = 1
-    while (calculate_quadratic_norm(calculate_residual(x0, TARGET_POINT, speed_reduction_shift)[0:2]) > precision) \
-            & (len(xtr.columns) < max_iterations_number):
-        F0 = calculate_residual(x0, TARGET_POINT, speed_reduction_shift)
-        F0 = pd.Series(F0)
-        F0 = pd.DataFrame(F0, index=F0.index)
-        x00 = pd.Series(x0)
-        x00 = pd.DataFrame(x00, index=x00.index)
-        x00 = x00.as_matrix() + np.dot(iteration_step_factor*get_iteration_matrix(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
-        xtr[i] = x00
-        x0 = xtr[i]
+    while (calculate_quadratic_norm(
+            calculate_residual(start_position, TARGET_POINT, speed_reduction_shift)[0:2]) > precision
+    ) & (len(path.columns) < max_iterations_number):
+        residual = calculate_residual(start_position, TARGET_POINT, speed_reduction_shift)
+        residual = pd.Series(residual)
+        residual = pd.DataFrame(residual, index=residual.index)
+        next_point = pd.Series(start_position)
+        next_point = pd.DataFrame(next_point, index=next_point.index)
+        next_point = next_point.as_matrix() + np.dot(
+            iteration_step_factor * get_iteration_matrix(
+                linear_velocity_proportional_factor, angular_velocity_proportional_factor
+            ).as_matrix(), residual.as_matrix())
+        path[i] = next_point
+        start_position = path[i]
         i += 1
-    ## возвращаем массив - в i-м столбце - i-е приближение
-    return xtr
+    return path
 
 
 ## **1. АНАЛИЗ РАБОТЫ ПИ-РЕГУЛЯТОРА при ЗАДАННЫХ ЗНАЧЕНИЯХ**

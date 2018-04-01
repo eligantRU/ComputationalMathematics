@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 from include.utils import *
 
+TITLE_FONT_SIZE = 16
+FONT_SIZE = 14
+
 epsX = PRECISION
 
 ## **1. АНАЛИЗ РАБОТЫ ПИ-РЕГУЛЯТОРА при ЗАДАННЫХ ЗНАЧЕНИЯХ**
@@ -17,9 +20,9 @@ ax = fig.add_subplot(1,1,1)
 ax.plot(res)
 ax.plot([0,len(res)-1], [epsX[len(res)-1], epsX[len(res)-1]], color="brown")
 plt.title("Изменение погрешности с ростом итераций \
-при linear_velocity_proportional_factor="+str(LINEAR_VELOCITY_PROPORTIONAL_FACTOR)+", angular_velocity_proportional_factor="+str(ANGULAR_VELOCITY_PROPORTIONAL_FACTOR)+", ITERATION_STEP_FACTOR="+str(ITERATION_STEP_FACTOR), fontsize=16)
-plt.xlabel("номер итерации", fontsize=14)
-plt.ylabel("погрешность", fontsize=14)
+при linear_velocity_proportional_factor="+str(LINEAR_VELOCITY_PROPORTIONAL_FACTOR)+", angular_velocity_proportional_factor="+str(ANGULAR_VELOCITY_PROPORTIONAL_FACTOR)+", ITERATION_STEP_FACTOR="+str(ITERATION_STEP_FACTOR), fontsize=TITLE_FONT_SIZE)
+plt.xlabel("номер итерации", fontsize=FONT_SIZE)
+plt.ylabel("погрешность", fontsize=FONT_SIZE)
 plt.show()
 
 ## 2. ПОИСК КВАЗИОПТИМАЛЬНЫХ ПАРАМЕТРОВ**
@@ -39,9 +42,9 @@ ax = fig.add_subplot(1,1,1)
 ax.plot(res1)
 ax.plot([0,len(res1)-1], [epsX[len(res1)-1], epsX[len(res1)-1]], color="brown")
 plt.title("Изменение погрешности с ростом итераций \
-при linear_velocity_proportional_factor="+str(linear_velocity_proportional_factor1)+", angular_velocity_proportional_factor="+str(angular_velocity_proportional_factor1)+", ITERATION_STEP_FACTOR="+str(iteration_step_factor1), fontsize=16)
-plt.xlabel("номер итерации", fontsize=14)
-plt.ylabel("погрешность", fontsize=14)
+при linear_velocity_proportional_factor="+str(linear_velocity_proportional_factor1)+", angular_velocity_proportional_factor="+str(angular_velocity_proportional_factor1)+", ITERATION_STEP_FACTOR="+str(iteration_step_factor1), fontsize=TITLE_FONT_SIZE)
+plt.xlabel("номер итерации", fontsize=FONT_SIZE)
+plt.ylabel("погрешность", fontsize=FONT_SIZE)
 plt.show()
 
 # РАСЧЕТ ТРАЕКТОРИИ РОБОТА и ВЫВОД ГРАФИКА
@@ -52,9 +55,9 @@ xtr2 = calculate_path(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGUL
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 ax.plot(xtr2.ix[0], xtr2.ix[1], color="red")
-plt.title("Траектория движения робота", fontsize=16)
-plt.xlabel("X", fontsize=14)
-plt.ylabel("Y", fontsize=14)
+plt.title("Траектория движения робота", fontsize=TITLE_FONT_SIZE)
+plt.xlabel("X", fontsize=FONT_SIZE)
+plt.ylabel("Y", fontsize=FONT_SIZE)
 plt.show()
 
 
@@ -70,9 +73,9 @@ ax = fig.add_subplot(1,1,1)
 ax.plot(ccframe.step[1:b], ccframe.cc[1:b], "k^", color="red")
 ax.plot(ccframe.step[b+1:b+b], ccframe.cc[b+1:b+b], "k+", color="green")
 ax.plot(ccframe.step[b+b+1:], ccframe.cc[b+b+1:], "k*", color="brown")
-plt.title("Оценка порядка и скорости сходимости", fontsize=16)
-plt.xlabel("step", fontsize=14)
-plt.ylabel("cc", fontsize=14)
+plt.title("Оценка порядка и скорости сходимости", fontsize=TITLE_FONT_SIZE)
+plt.xlabel("step", fontsize=FONT_SIZE)
+plt.ylabel("cc", fontsize=FONT_SIZE)
 plt.show()
 
 order = [1.0]

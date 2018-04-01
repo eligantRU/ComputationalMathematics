@@ -9,7 +9,6 @@ MAX_ITERATIONS_NUMBER = 100
 START_POSITION = (0, 0, 0)  # x y fi
 TARGET_POINT = (4, 1, 17)  # A B C
 
-# ORIGIN
 ITERATION_STEP_FACTOR = 0.5
 SPEED_REDUCTION_SHIFT = 0.5
 LINEAR_VELOCITY_PROPORTIONAL_FACTOR = 0.5
@@ -103,8 +102,8 @@ def calculate_path(start_position, linear_velocity_proportional_factor, angular_
     path = pd.DataFrame(path, index=path.index)
     i = 1
     while (calculate_quadratic_norm(
-            calculate_residual(start_position, TARGET_POINT, SPEED_REDUCTION_SHIFT)[0:2]) > PRECISION
-    ) & (len(path.columns) < MAX_ITERATIONS_NUMBER):
+            calculate_residual(start_position, TARGET_POINT, SPEED_REDUCTION_SHIFT)[0:2]
+    ) > PRECISION) & (len(path.columns) < MAX_ITERATIONS_NUMBER):
         residual = calculate_residual(start_position, TARGET_POINT, SPEED_REDUCTION_SHIFT)
         residual = pd.Series(residual)
         residual = pd.DataFrame(residual, index=residual.index)

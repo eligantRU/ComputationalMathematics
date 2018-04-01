@@ -42,7 +42,6 @@ def calculate_residual(current_position, target_point, speed_reduction_factor):
     )
 
 
-# погрешность достижения цели
 def calculate_target_error(current_position, target_point, speed_reduction_factor):
     error = []
     for ic in current_position.columns:

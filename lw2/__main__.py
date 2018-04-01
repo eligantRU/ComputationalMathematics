@@ -20,7 +20,7 @@ def calculate_path(x0, linear_velocity_proportional_factor, angular_velocity_pro
     xtr = pd.DataFrame(xtr, index=xtr.index)
     i = 1
     while (calculate_quadratic_norm(calculate_residual(x0, TARGET_POINT, speed_reduction_shift)[0:2]) > precision) \
-                & (len(xtr.columns) < max_iterations_number):
+            & (len(xtr.columns) < max_iterations_number):
         F0 = calculate_residual(x0, TARGET_POINT, speed_reduction_shift)
         F0 = pd.Series(F0)
         F0 = pd.DataFrame(F0, index=F0.index)
@@ -91,9 +91,9 @@ plt.show()
 
 # 3.	ИССЛЕДУЕМ ПОРЯДОК И СКОРОСТЬ СХОДИМОСТИ
 # ПРОГРАММА РАСЧЕТА ПОСЛЕДОВАТЕЛЬНОСТИ ОТНОШЕНИЯ:
-xfin = xtr[len(xtr.columns)-1]
+last_point = xtr[len(xtr.columns)-1]
 c = 1, 1.05, 1.1
-ccframe = get_convergence_rate(xtr, xfin, c)
+ccframe = get_convergence_rate(xtr, last_point, c)
 b = int(len(ccframe) / len(c))
 
 fig = plt.figure()
@@ -107,5 +107,5 @@ plt.ylabel("cc", fontsize=14)
 plt.show()
 
 order = [1.0]
-convergence_rate = get_convergence_rate(xtr, xfin, order)
+convergence_rate = get_convergence_rate(xtr, last_point, order)
 print("velocity = ", 1 / convergence_rate.cc.mean())

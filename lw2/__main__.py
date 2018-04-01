@@ -29,6 +29,7 @@ def find_quasioptimal_parameters():
     path = calculate_path(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR,
                           ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR)
     target_error = calculate_target_error(path, TARGET_POINT, SPEED_REDUCTION_SHIFT)
+
     res = pd.DataFrame(target_error, index=path.columns)
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -50,6 +51,7 @@ def find_quasioptimal_parameters():
 def show_path():
     path = calculate_path(START_POSITION, ORIGIN_LINEAR_VELOCITY_PROPORTIONAL_FACTOR,
                           ORIGIN_ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_PATH_STEP_FACTOR)
+
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(path.ix[0], path.ix[1], color="red")

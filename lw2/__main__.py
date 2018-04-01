@@ -15,7 +15,7 @@ LINEAR_VELOCITY_PROPORTIONAL_FACTOR = 0.5
 ANGULAR_VELOCITY_PROPORTIONAL_FACTOR = 2
 
 
-def do_iteration(linear_velocity_proportional_factor, angular_velocity_proportional_factor):
+def get_iteration_matrix(linear_velocity_proportional_factor, angular_velocity_proportional_factor):
     matrix = (
         linear_velocity_proportional_factor, 0, 0,
         0, linear_velocity_proportional_factor, 0,
@@ -24,7 +24,7 @@ def do_iteration(linear_velocity_proportional_factor, angular_velocity_proportio
     return pd.DataFrame([matrix[0:3], matrix[3:6], matrix[6:9]])
 
 
-def iterMeth(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT=0.5, epsX=0.1, maxIter=50):
+def calculate_path(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT=0.5, epsX=0.1, maxIter=50):
     xtr = pd.Series(x0)
     xtr = pd.DataFrame(xtr, index=xtr.index)
     i = 1
@@ -35,7 +35,7 @@ def iterMeth(x0, linear_velocity_proportional_factor, angular_velocity_proportio
         F0 = pd.DataFrame(F0, index=F0.index)
         x00 = pd.Series(x0)
         x00 = pd.DataFrame(x00, index=x00.index)
-        x00 = x00.as_matrix() + np.dot(ITERATION_STEP_FACTOR*do_iteration(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
+        x00 = x00.as_matrix() + np.dot(ITERATION_STEP_FACTOR*get_iteration_matrix(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
         xtr[i] = x00
         x0 = xtr[i]
         i += 1
@@ -45,7 +45,7 @@ def iterMeth(x0, linear_velocity_proportional_factor, angular_velocity_proportio
 
 ## **1. АНАЛИЗ РАБОТЫ ПИ-РЕГУЛЯТОРА при ЗАДАННЫХ ЗНАЧЕНИЯХ**
 # РАСЧЕТ ТРАЕКТОРИИ при ЗАДАННЫХ ЗНАЧЕНИЯХ ПАРАМЕТРОВ:*
-xtr = iterMeth(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT)
+xtr = calculate_path(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT)
 
 ## *РАСЧЕТ И ВЫВОД ГРАФИКА ИЗМЕНЕНИЯ НЕВЯЗКИ:*
 ind = xtr.columns
@@ -68,7 +68,7 @@ linear_velocity_proportional_factor1 = 1
 angular_velocity_proportional_factor1 = 2
 ITERATION_STEP_FACTOR1 = 0.5
 # SPEED_REDUCTION_SHIFTopt = 0.5
-xtr1 = iterMeth(START_POSITION, linear_velocity_proportional_factor1, angular_velocity_proportional_factor1, ITERATION_STEP_FACTOR1)
+xtr1 = calculate_path(START_POSITION, linear_velocity_proportional_factor1, angular_velocity_proportional_factor1, ITERATION_STEP_FACTOR1)
 
 # РАСЧЕТ И ВЫВОД ГРАФИКА ИЗМЕНЕНИЯ НЕВЯЗКИ:
 ind1 = xtr1.columns
@@ -87,7 +87,7 @@ plt.show()
 # РАСЧЕТ ТРАЕКТОРИИ РОБОТА и ВЫВОД ГРАФИКА
 # Для обеспечения плавности траектории выберем мелкий шаг ITERATION_STEP_FACTOR
 ITERATION_STEP_FACTOR = 0.1
-xtr2 = iterMeth(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT)
+xtr2 = calculate_path(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT)
 #
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)

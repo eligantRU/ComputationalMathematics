@@ -25,7 +25,7 @@ def execute_origin(path):
     plt.show()
 
 
-def find_quasioptimal_parameters():
+def find_quasi_optimal_parameters():
     path = calculate_path(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR,
                           ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR)
     target_error = calculate_target_error(path, TARGET_POINT, SPEED_REDUCTION_SHIFT)
@@ -63,15 +63,15 @@ def show_path():
 
 def estimate_convergence_rate(path):
     last_point = path[len(path.columns) - 1]
-    c = 1, 1.05, 1.1
-    ccframe = get_convergence_rate(path, last_point, c)
-    b = int(len(ccframe) / len(c))
+    c = [1, 1.05, 1.1]
+    convergence_rate_frame = get_convergence_rate(path, last_point, c)
+    b = int(len(convergence_rate_frame) / len(c))
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(ccframe.step[1:b], ccframe.cc[1:b], "k^", color="red")
-    ax.plot(ccframe.step[b + 1:b + b], ccframe.cc[b + 1:b + b], "k+", color="green")
-    ax.plot(ccframe.step[b + b + 1:], ccframe.cc[b + b + 1:], "k*", color="brown")
+    ax.plot(convergence_rate_frame.step[1:b], convergence_rate_frame.cc[1:b], "k^", color="red")
+    ax.plot(convergence_rate_frame.step[b + 1:b + b], convergence_rate_frame.cc[b + 1:b + b], "k+", color="green")
+    ax.plot(convergence_rate_frame.step[b + b + 1:], convergence_rate_frame.cc[b + b + 1:], "k*", color="brown")
     plt.title("Estimation of the order and speed of convergence", fontsize=TITLE_FONT_SIZE)
     plt.xlabel("Step", fontsize=FONT_SIZE)
     plt.ylabel("Convergence rate", fontsize=FONT_SIZE)
@@ -86,7 +86,7 @@ def main():
     origin_path = calculate_path(START_POSITION, ORIGIN_LINEAR_VELOCITY_PROPORTIONAL_FACTOR,
                                  ORIGIN_ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ORIGIN_ITERATION_STEP_FACTOR)
     execute_origin(origin_path)
-    find_quasioptimal_parameters()
+    find_quasi_optimal_parameters()
 
     show_path()
     estimate_convergence_rate(origin_path)

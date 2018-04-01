@@ -1,4 +1,3 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 from include.utils import *
 
@@ -15,27 +14,19 @@ LINEAR_VELOCITY_PROPORTIONAL_FACTOR = 0.5
 ANGULAR_VELOCITY_PROPORTIONAL_FACTOR = 2
 
 
-def get_iteration_matrix(linear_velocity_proportional_factor, angular_velocity_proportional_factor):
-    matrix = (
-        linear_velocity_proportional_factor, 0, 0,
-        0, linear_velocity_proportional_factor, 0,
-        0, 0, angular_velocity_proportional_factor
-    )
-    return pd.DataFrame([matrix[0:3], matrix[3:6], matrix[6:9]])
-
-
-def calculate_path(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT=0.5, epsX=0.1, maxIter=50):
+def calculate_path(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, iteration_step_factor,
+                   speed_reduction_shift=0.5, precision=0.1, max_iterations_number=50):
     xtr = pd.Series(x0)
     xtr = pd.DataFrame(xtr, index=xtr.index)
     i = 1
-    while (calculate_quadratic_norm(calculate_residual(x0, TARGET_POINT, SPEED_REDUCTION_SHIFT)[0:2]) > epsX) \
-                & (len(xtr.columns) < maxIter):
-        F0 = calculate_residual(x0, TARGET_POINT, SPEED_REDUCTION_SHIFT)
+    while (calculate_quadratic_norm(calculate_residual(x0, TARGET_POINT, speed_reduction_shift)[0:2]) > precision) \
+                & (len(xtr.columns) < max_iterations_number):
+        F0 = calculate_residual(x0, TARGET_POINT, speed_reduction_shift)
         F0 = pd.Series(F0)
         F0 = pd.DataFrame(F0, index=F0.index)
         x00 = pd.Series(x0)
         x00 = pd.DataFrame(x00, index=x00.index)
-        x00 = x00.as_matrix() + np.dot(ITERATION_STEP_FACTOR*get_iteration_matrix(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
+        x00 = x00.as_matrix() + np.dot(iteration_step_factor*get_iteration_matrix(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
         xtr[i] = x00
         x0 = xtr[i]
         i += 1
@@ -100,26 +91,6 @@ plt.show()
 
 # 3.	ИССЛЕДУЕМ ПОРЯДОК И СКОРОСТЬ СХОДИМОСТИ
 # ПРОГРАММА РАСЧЕТА ПОСЛЕДОВАТЕЛЬНОСТИ ОТНОШЕНИЯ:
-def get_convergence_rate(x, xfin, p):
-    numv = len(x.columns)
-    pf, cc = [], []
-    step = list(range(numv))*len(p)
-    i = 0
-    for n in range(len(p)):
-        for m in range(numv):
-            pf.append(p[n])
-    for ip in range(len(p)):
-        cc.append(1.)
-        for ix in range(1, numv):
-            cc.append(calculate_quadratic_norm(xfin - x[:][ix]) / calculate_quadratic_norm(xfin - x[:][ix-1])**pf[i])
-            i += 1
-    return pd.DataFrame({
-        "step": pd.Series(step),
-        "cc": pd.Series(cc),
-        "pf": pd.Series(pf)
-    })
-
-
 xfin = xtr[len(xtr.columns)-1]
 c = 1, 1.05, 1.1
 ccframe = get_convergence_rate(xtr, xfin, c)

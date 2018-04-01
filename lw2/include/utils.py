@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from math import *
 
 
@@ -49,3 +50,34 @@ def calculate_target_error(current_position, target_point, speed_reduction_shift
             calculate_residual(current_position[:][ic], target_point, speed_reduction_shift)[0:2]
         ))
     return error
+
+
+def get_iteration_matrix(linear_velocity_proportional_factor, angular_velocity_proportional_factor):
+    matrix = (
+        linear_velocity_proportional_factor, 0, 0,
+        0, linear_velocity_proportional_factor, 0,
+        0, 0, angular_velocity_proportional_factor
+    )
+    return pd.DataFrame([matrix[0:3], matrix[3:6], matrix[6:9]])
+
+
+def get_convergence_rate(path, xfin, p):
+    steps_number = len(path.columns)
+    pf, cc = [], []
+    step = list(range(steps_number)) * len(p)
+    i = 0
+    for n in range(len(p)):
+        for m in range(steps_number):
+            pf.append(p[n])
+    for ip in range(len(p)):
+        cc.append(1.)
+        for ix in range(1, steps_number):
+            cc.append(
+                calculate_quadratic_norm(xfin - path[:][ix]) / calculate_quadratic_norm(xfin - path[:][ix-1])**pf[i]
+            )
+            i += 1
+    return pd.DataFrame({
+        "step": pd.Series(step),
+        "cc": pd.Series(cc),
+        "pf": pd.Series(pf)
+    })

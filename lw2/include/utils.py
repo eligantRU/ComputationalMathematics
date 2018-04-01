@@ -3,6 +3,19 @@ import pandas as pd
 from math import *
 
 
+PRECISION = 0.1
+MAX_ITERATIONS_NUMBER = 100
+
+START_POSITION = (0, 0, 0)  # x y fi
+TARGET_POINT = (4, 1, 17)  # A B C
+
+# ORIGIN
+ITERATION_STEP_FACTOR = 0.5
+SPEED_REDUCTION_SHIFT = 0.5
+LINEAR_VELOCITY_PROPORTIONAL_FACTOR = 0.5
+ANGULAR_VELOCITY_PROPORTIONAL_FACTOR = 2
+
+
 def normalize_angle(fi):
     while abs(fi) > pi:
         fi -= 2 * pi * np.sign(fi)
@@ -82,3 +95,26 @@ def get_convergence_rate(path, last_point, order):
         "cc": pd.Series(cc),
         "pf": pd.Series(pf)
     })
+
+
+def calculate_path(start_position, linear_velocity_proportional_factor, angular_velocity_proportional_factor,
+                   iteration_step_factor):
+    path = pd.Series(start_position)
+    path = pd.DataFrame(path, index=path.index)
+    i = 1
+    while (calculate_quadratic_norm(
+            calculate_residual(start_position, TARGET_POINT, SPEED_REDUCTION_SHIFT)[0:2]) > PRECISION
+    ) & (len(path.columns) < MAX_ITERATIONS_NUMBER):
+        residual = calculate_residual(start_position, TARGET_POINT, SPEED_REDUCTION_SHIFT)
+        residual = pd.Series(residual)
+        residual = pd.DataFrame(residual, index=residual.index)
+        next_point = pd.Series(start_position)
+        next_point = pd.DataFrame(next_point, index=next_point.index)
+        next_point = next_point.as_matrix() + np.dot(
+            iteration_step_factor * get_iteration_matrix(
+                linear_velocity_proportional_factor, angular_velocity_proportional_factor
+            ).as_matrix(), residual.as_matrix())
+        path[i] = next_point
+        start_position = path[i]
+        i += 1
+    return path

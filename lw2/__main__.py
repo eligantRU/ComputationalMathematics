@@ -5,34 +5,37 @@ from include.utils import *
 epsX = 0.1  # PRECISION
 MAX_ITERATIONS_NUMBER = 100
 
-# **ИСХОДНЫЕ ДАННЫЕ: параметры варианта**
 START_POSITION = (0, 0, 0)  # x0 y0 fi0
 TARGET_POINT = (4, 1, 17)  # A B C
 
-# **ИСХОДНЫЕ ДАННЫЕ: подбираемые параметры**
-alfa = 0.5     # - коэффициент альфа обеспечения сходимости (коэффициент итерационного шага)
-betta = 0.5    # - коэффициент бетта для расчёта kB
+# ORIGIN
+ITERATION_STEP_FACTOR = 0.5
+SPEED_REDUCTION_SHIFT = 0.5
 LINEAR_VELOCITY_PROPORTIONAL_FACTOR = 0.5
 ANGULAR_VELOCITY_PROPORTIONAL_FACTOR = 2
 
 
 def do_iteration(linear_velocity_proportional_factor, angular_velocity_proportional_factor):
-    vm = (linear_velocity_proportional_factor, 0, 0, 0, linear_velocity_proportional_factor, 0, 0, 0, angular_velocity_proportional_factor)
-    return pd.DataFrame([vm[0:3], vm[3:6], vm[6:9]])
+    matrix = (
+        linear_velocity_proportional_factor, 0, 0,
+        0, linear_velocity_proportional_factor, 0,
+        0, 0, angular_velocity_proportional_factor
+    )
+    return pd.DataFrame([matrix[0:3], matrix[3:6], matrix[6:9]])
 
 
-def iterMeth(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, alfa=1, betta=0.5, epsX=0.1, maxIter=50):
+def iterMeth(x0, linear_velocity_proportional_factor, angular_velocity_proportional_factor, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT=0.5, epsX=0.1, maxIter=50):
     xtr = pd.Series(x0)
     xtr = pd.DataFrame(xtr, index=xtr.index)
     i = 1
-    while (calculate_quadratic_norm(calculate_residual(x0, TARGET_POINT, betta)[0:2]) > epsX) \
+    while (calculate_quadratic_norm(calculate_residual(x0, TARGET_POINT, SPEED_REDUCTION_SHIFT)[0:2]) > epsX) \
                 & (len(xtr.columns) < maxIter):
-        F0 = calculate_residual(x0, TARGET_POINT, betta)
+        F0 = calculate_residual(x0, TARGET_POINT, SPEED_REDUCTION_SHIFT)
         F0 = pd.Series(F0)
         F0 = pd.DataFrame(F0, index=F0.index)
         x00 = pd.Series(x0)
         x00 = pd.DataFrame(x00, index=x00.index)
-        x00 = x00.as_matrix() + np.dot(alfa*do_iteration(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
+        x00 = x00.as_matrix() + np.dot(ITERATION_STEP_FACTOR*do_iteration(linear_velocity_proportional_factor,angular_velocity_proportional_factor).as_matrix(), F0.as_matrix())
         xtr[i] = x00
         x0 = xtr[i]
         i += 1
@@ -42,21 +45,19 @@ def iterMeth(x0, linear_velocity_proportional_factor, angular_velocity_proportio
 
 ## **1. АНАЛИЗ РАБОТЫ ПИ-РЕГУЛЯТОРА при ЗАДАННЫХ ЗНАЧЕНИЯХ**
 # РАСЧЕТ ТРАЕКТОРИИ при ЗАДАННЫХ ЗНАЧЕНИЯХ ПАРАМЕТРОВ:*
-xtr = iterMeth(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, alfa, betta)
+xtr = iterMeth(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT)
 
 ## *РАСЧЕТ И ВЫВОД ГРАФИКА ИЗМЕНЕНИЯ НЕВЯЗКИ:*
 ind = xtr.columns
-epsX = calculate_target_error(xtr, TARGET_POINT, betta)
+epsX = calculate_target_error(xtr, TARGET_POINT, SPEED_REDUCTION_SHIFT)
 res = pd.DataFrame(epsX, index = ind)
-#
-plt.rcParams["font.fantasy"] = "Arial", "Times New Roman", "Tahoma", "Comic Sans MS", "Courier"
-plt.rcParams["font.family"] = "fantasy"
+
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 ax.plot(res)
 ax.plot([0,len(res)-1], [epsX[len(res)-1], epsX[len(res)-1]], color="brown")
 plt.title("Изменение погрешности с ростом итераций \
-при linear_velocity_proportional_factor="+str(LINEAR_VELOCITY_PROPORTIONAL_FACTOR)+", angular_velocity_proportional_factor="+str(ANGULAR_VELOCITY_PROPORTIONAL_FACTOR)+", alfa="+str(alfa), fontsize=16)
+при linear_velocity_proportional_factor="+str(LINEAR_VELOCITY_PROPORTIONAL_FACTOR)+", angular_velocity_proportional_factor="+str(ANGULAR_VELOCITY_PROPORTIONAL_FACTOR)+", ITERATION_STEP_FACTOR="+str(ITERATION_STEP_FACTOR), fontsize=16)
 plt.xlabel("номер итерации", fontsize=14)
 plt.ylabel("погрешность", fontsize=14)
 plt.show()
@@ -65,28 +66,28 @@ plt.show()
 ### РАСЧЕТ ТРАЕКТОРИИ СКОРОСТИ при ВЫБРАННЫХ ЗНАЧЕНИЯХ ПАРАМЕТРОВ ПИ-регулятора:*
 linear_velocity_proportional_factor1 = 1
 angular_velocity_proportional_factor1 = 2
-alfa1 = 0.5
-# bettaopt = 0.5
-xtr1 = iterMeth(START_POSITION, linear_velocity_proportional_factor1, angular_velocity_proportional_factor1, alfa1)
+ITERATION_STEP_FACTOR1 = 0.5
+# SPEED_REDUCTION_SHIFTopt = 0.5
+xtr1 = iterMeth(START_POSITION, linear_velocity_proportional_factor1, angular_velocity_proportional_factor1, ITERATION_STEP_FACTOR1)
 
 # РАСЧЕТ И ВЫВОД ГРАФИКА ИЗМЕНЕНИЯ НЕВЯЗКИ:
 ind1 = xtr1.columns
-epsX = calculate_target_error(xtr1, TARGET_POINT, betta)
+epsX = calculate_target_error(xtr1, TARGET_POINT, SPEED_REDUCTION_SHIFT)
 res1 = pd.DataFrame(epsX, index = ind1)
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 ax.plot(res1)
 ax.plot([0,len(res1)-1], [epsX[len(res1)-1], epsX[len(res1)-1]], color="brown")
 plt.title("Изменение погрешности с ростом итераций \
-при linear_velocity_proportional_factor="+str(linear_velocity_proportional_factor1)+", angular_velocity_proportional_factor="+str(angular_velocity_proportional_factor1)+", alfa="+str(alfa1), fontsize=16)
+при linear_velocity_proportional_factor="+str(linear_velocity_proportional_factor1)+", angular_velocity_proportional_factor="+str(angular_velocity_proportional_factor1)+", ITERATION_STEP_FACTOR="+str(ITERATION_STEP_FACTOR1), fontsize=16)
 plt.xlabel("номер итерации", fontsize=14)
 plt.ylabel("погрешность", fontsize=14)
 plt.show()
 
 # РАСЧЕТ ТРАЕКТОРИИ РОБОТА и ВЫВОД ГРАФИКА
-# Для обеспечения плавности траектории выберем мелкий шаг alfa
-alfa = 0.1
-xtr2 = iterMeth(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, alfa, betta)
+# Для обеспечения плавности траектории выберем мелкий шаг ITERATION_STEP_FACTOR
+ITERATION_STEP_FACTOR = 0.1
+xtr2 = iterMeth(START_POSITION, LINEAR_VELOCITY_PROPORTIONAL_FACTOR, ANGULAR_VELOCITY_PROPORTIONAL_FACTOR, ITERATION_STEP_FACTOR, SPEED_REDUCTION_SHIFT)
 #
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)

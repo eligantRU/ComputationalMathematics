@@ -63,7 +63,7 @@ def show_path():
 
 def estimate_convergence_rate(path):
     last_point = path[len(path.columns) - 1]
-    c = [1, 1.05, 1.1]
+    c = [1., 1.05, 1.1]
     convergence_rate_frame = get_convergence_rate(path, last_point, c)
     b = int(len(convergence_rate_frame) / len(c))
 
@@ -77,7 +77,7 @@ def estimate_convergence_rate(path):
     plt.ylabel("Convergence rate", fontsize=FONT_SIZE)
     plt.show()
 
-    order = [1.0]
+    order = [1.]
     convergence_rate = get_convergence_rate(path, last_point, order)
     print("Velocity = ", 1 / convergence_rate.cc.mean())
 

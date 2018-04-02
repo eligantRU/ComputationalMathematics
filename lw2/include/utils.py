@@ -79,29 +79,6 @@ def get_iteration_matrix(linear_velocity_proportional_factor, angular_velocity_p
     return pd.DataFrame([matrix[0:3], matrix[3:6], matrix[6:9]])
 
 
-def get_convergence_rate(path, last_point, order):
-    steps_number = len(path.columns)
-    pf, cc = [], []
-    step = list(range(steps_number)) * len(order)
-    i = 0
-    for n in range(len(order)):
-        for m in range(steps_number):
-            pf.append(order[n])
-    for ip in range(len(order)):
-        cc.append(1.)
-        for ix in range(1, steps_number):
-            cc.append(
-                calculate_quadratic_norm(last_point - path[:][ix])
-                / calculate_quadratic_norm(last_point - path[:][ix-1])**pf[i]
-            )
-            i += 1
-    return pd.DataFrame({
-        "step": pd.Series(step),
-        "cc": pd.Series(cc),
-        "pf": pd.Series(pf)
-    })
-
-
 def calculate_path(start_position, linear_velocity_proportional_factor, angular_velocity_proportional_factor,
                    iteration_step_factor):
     path = pd.Series(start_position)
@@ -123,3 +100,26 @@ def calculate_path(start_position, linear_velocity_proportional_factor, angular_
         start_position = path[i]
         i += 1
     return path
+
+
+def get_convergence_rate(path, last_point, order):
+    steps_number = len(path.columns)
+    pf, cc = [], []
+    step = list(range(steps_number)) * len(order)
+    i = 0
+    for n in range(len(order)):
+        for m in range(steps_number):
+            pf.append(order[n])
+    for ip in range(len(order)):
+        cc.append(1.)
+        for ix in range(1, steps_number):
+            cc.append(
+                calculate_quadratic_norm(last_point - path[:][ix])
+                / calculate_quadratic_norm(last_point - path[:][ix-1])**pf[i]
+            )
+            i += 1
+    return pd.DataFrame({
+        "step": pd.Series(step),
+        "cc": pd.Series(cc),
+        "pf": pd.Series(pf)
+    })

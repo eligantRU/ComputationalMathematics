@@ -1,4 +1,5 @@
 from mpl_toolkits.mplot3d import Axes3D
+from scipy import interpolate
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -36,8 +37,10 @@ def main():
     ax = fig.gca(projection="3d")
 
     t = np.linspace(0, 1, 11)
-    x = calc_x(t)
-    y = calc_y(t)
+    x, y = calc_x(t), calc_y(t)
+    tck, u = interpolate.splprep([x, y], s=0)
+    unew = np.arange(0, 1.01, 0.01)
+    x, y = interpolate.splev(unew, tck)
     ax.plot(x, y, zs=0, zdir="x")
 
     ax.set_xlim(-0.4, 0.4)

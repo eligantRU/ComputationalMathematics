@@ -1,3 +1,4 @@
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -31,12 +32,21 @@ calc_x = np.vectorize(calc_x)
 
 
 def main():
+    fig = plt.figure()
+    ax = fig.gca(projection="3d")
+
     t = np.linspace(0, 1, 11)
     x = calc_x(t)
     y = calc_y(t)
-    plt.figure()
-    plt.plot(x, y, '--o')
-    plt.axis([-0.5, 1.5, -0.5, 1.5])
+    ax.plot(x, y, zs=0, zdir="x")
+
+    ax.set_xlim(-0.4, 0.4)
+    ax.set_ylim(-0.4, 0.6)
+    ax.set_zlim(-0.3, 0.6)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+
     plt.show()
 
 

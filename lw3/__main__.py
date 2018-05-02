@@ -4,12 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def fill(n, val):
-    a = np.empty(n)
-    a.fill(val)
-    return a
-
-
 def calc_x(t):
     if 0. <= t < 0.4:
         return 0.2

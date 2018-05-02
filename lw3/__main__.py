@@ -43,6 +43,8 @@ def main():
     x, y = interpolate.splev(unew, tck)
     ax.plot(x, y, zs=0, zdir="x")
 
+    ax.scatter(unew - unew, x, y)
+
     ax.set_xlim(-0.4, 0.4)
     ax.set_ylim(-0.4, 0.6)
     ax.set_zlim(-0.3, 0.6)

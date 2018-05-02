@@ -2,10 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-STEP = 0.125
-COUNT = int(1 / STEP)
-
-
 def fill(n, val):
     a = np.empty(n)
     a.fill(val)

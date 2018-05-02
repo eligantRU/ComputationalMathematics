@@ -34,7 +34,7 @@ calc_x = np.vectorize(calc_x)
 
 def main():
     fig = plt.figure()
-    ax = fig.gca(projection="3d")
+    ax = Axes3D(fig)
 
     t = np.linspace(0, 1, 11)
     x, y = calc_x(t), calc_y(t)

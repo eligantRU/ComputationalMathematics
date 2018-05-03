@@ -35,9 +35,9 @@ def main():
     tck, u = interpolate.splprep([x, y], s=0)
     unew = np.arange(0, 1.01, 0.01)
     x, y = interpolate.splev(unew, tck)
-    ax.plot(x, y, zs=0, zdir="x")
+    ax.plot(x, y, zs=0, zdir="x", c="red")
 
-    ax.scatter(unew - unew, x, y)
+    ax.scatter(unew - unew, x, y, s=100, c="blue")
 
     ax.set_xlim(-0.4, 0.4)
     ax.set_ylim(-0.4, 0.6)

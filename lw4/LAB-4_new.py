@@ -23,28 +23,11 @@ from datetime import datetime, timedelta
 from math import *
 
                                                 
-LEARN_INTERVAL = datetime(2009, 1, 1), datetime(2015, 1, 1)
-CHECK_INTERVAL = datetime(2015, 1, 2), datetime(2018, 4, 29)
-RIDGE_COEFF = 18
-L1_COEFF = 0.5 
+LEARN_INTERVAL = datetime(2009, 1, 1), datetime(2017, 7, 1)
+CHECK_INTERVAL = datetime(2017, 7, 1), datetime(2017, 8, 1)
+RIDGE_COEFF = 1.709
+L1_COEFF = 63
                   
-def calculate_months_average(data):
-    month = 1
-    dollors_month_sum = 0
-    values_count = 0
-
-    infos = []
-    for row in data:
-        if row["date"].month == month:
-            dollors_month_sum = dollors_month_sum + row["dollar"]
-            values_count = values_count + 1
-        else:
-            infos.append(dollors_month_sum / values_count)
-            month = month % 12 + 1
-            dollors_month_sum = 0
-            values_count = 0
-    return infos
-
 def to_data_format(begin, days, dollars):
     if days.shape != dollars.shape:
         raise Exception('Length of days doesn`t mutch with length of dollars', days.shape, dollars.shape)
@@ -79,6 +62,24 @@ def get_data(begin, end, data):
             dollars.append(row["dollar"])
             days.append(row["day"])
     return (np.array(days), np.array(dollars))
+
+def calculate_week_average(data):
+    current_week = data[0]["day"] // 7
+    week_average = 0
+    week_values_count = 0
+    dollars = []
+    weeks = []
+    for row in data:
+        week = row["day"] // 7   
+        week_average += row["dollar"]
+        week_values_count += 1
+        if current_week < week:
+            dollars.append(week_average / week_values_count)
+            weeks.append(current_week)
+            current_week = week            
+            week_average = 0
+            week_values_count = 0          
+    return (weeks, dollars)
 
 def create_functional(base_functions, days):
     functional = []
@@ -120,25 +121,25 @@ def compute_base_functions_coefs_by_l1(base_functions, days, dollars, l1_coeff, 
 def compute_error(true_values, computed_values):
     if true_values.shape != computed_values.shape:
         raise Exception('Length of true values doesn`t mutch with length of computed values', true_values.shape, computed_values.shape)
-    return ((true_values - computed_values)**2).sum()
+    return ((true_values - computed_values)**2).sum() / len(true_values)
 
-def draw_plt(days, true_values, mnk_values, l2_values, l1_values):
-    true_infos = calculate_months_average(
-        to_data_format(LEARN_INTERVAL[0], days, true_values)
+def draw_plt(start_data, days, true_values, mnk_values, l2_values, l1_values):
+    true_weeks, true_dollars = calculate_week_average(
+        to_data_format(start_data, days, true_values)
     )
-    mnk_infos = calculate_months_average(
-        to_data_format(LEARN_INTERVAL[0], days, mnk_values)
+    mnk_weeks, mnk_dollars = calculate_week_average(
+        to_data_format(start_data, days, mnk_values)
     )
-    l2_infos = calculate_months_average(
-        to_data_format(LEARN_INTERVAL[0], days, l2_values)
+    l2_weeks, l2_dollars = calculate_week_average(
+        to_data_format(start_data, days, l2_values)
     )
-    l1_infos = calculate_months_average(
+    l1_weeks, l1_dollars = calculate_week_average(
         to_data_format(LEARN_INTERVAL[0], days, l1_values)
     )
-    true_plt = plt.plot(range(0, len(true_infos)), true_infos, '-', label="true values")
-    mnk_plt = plt.plot(range(0, len(mnk_infos)), mnk_infos, '-', label="mnk values")
-    l2_plt = plt.plot(range(0, len(l2_infos)), l2_infos, '-', label="l2 values")
-    l2_plt = plt.plot(range(0, len(l1_infos)), l1_infos, '-', label="l1 values")
+    plt.plot(true_weeks, true_dollars, '-', label="true values")
+    plt.plot(mnk_weeks, mnk_dollars, '-', label="mnk values")
+    plt.plot(l2_weeks, l2_dollars, '-', label="l2 values")
+    plt.plot(l1_weeks, l1_dollars, '-', label="l1 values")
     plt.legend()
     plt.show()    
 
@@ -168,7 +169,6 @@ def main():
         lambda x: x**2,        
         lambda x: x,        
         lambda x: 1,
-
     ]
 
     learn_functional = create_functional(base_functions, learn_days);
@@ -193,8 +193,8 @@ def main():
     l1_check_dollars = np.array((check_functional * np.matrix(l1_base_functions_coeffs).transpose()).transpose())[0]
     print("L1 check error:", compute_error(check_dollars, l1_check_dollars))
     
-    draw_plt(learn_days, learn_dollars, mnk_learn_dollars, l2_learn_dollars, l1_learn_dollars)
-    draw_plt(check_days, check_dollars, mnk_check_dollars, l2_check_dollars, l1_check_dollars)
+    draw_plt(LEARN_INTERVAL[0], learn_days, learn_dollars, mnk_learn_dollars, l2_learn_dollars, l1_learn_dollars)
+    draw_plt(CHECK_INTERVAL[0], check_days, check_dollars, mnk_check_dollars, l2_check_dollars, l1_check_dollars)
 
 if __name__ == "__main__":
     main()

@@ -26,7 +26,7 @@ from math import *
 LEARN_INTERVAL = datetime(2009, 1, 1), datetime(2017, 7, 1)
 CHECK_INTERVAL = datetime(2017, 7, 1), datetime(2017, 8, 1)
 RIDGE_COEFF = 1.709
-L1_COEFF = 63
+L1_COEFF = 17.09
                   
 def to_data_format(begin, days, dollars):
     if days.shape != dollars.shape:
@@ -76,9 +76,9 @@ def calculate_week_average(data):
         if current_week < week:
             dollars.append(week_average / week_values_count)
             weeks.append(current_week)
-            current_week = week            
+            current_week = week
             week_average = 0
-            week_values_count = 0          
+            week_values_count = 0
     return (weeks, dollars)
 
 def create_functional(base_functions, days):
@@ -95,15 +95,15 @@ def compute_base_functions_coefs_by_mnk(functional, days, dollars):
     return np.linalg.inv(transposed_functional * functional) * transposed_functional * np.matrix(dollars).transpose();
 
 
-def compute_base_functions_coefs_by_l2(functional, days, dollars, redge_coeff):
+def compute_base_functions_coefs_by_l2(functional, days, dollars, ridge_coeff):
     transposed_functional = functional.transpose();
-    return np.linalg.inv(transposed_functional * functional - redge_coeff * np.identity(functional.shape[1])) * transposed_functional * np.matrix(dollars).transpose();    
+    return np.linalg.inv(transposed_functional * functional - ridge_coeff * np.identity(functional.shape[1])) * transposed_functional * np.matrix(dollars).transpose();
 
 def compute_base_functions_coefs_by_l1(base_functions, days, dollars, l1_coeff, l2_base_funcs_coeffs):
     equation_matrix = []
     free_members = []    
     for j in range(0, len(base_functions)):
-        variables_coeffs = []       
+        variables_coeffs = []
         for k in range(0, len(base_functions)):
             coeff = 0.;
             for i in range(0, len(days)):
@@ -113,7 +113,7 @@ def compute_base_functions_coefs_by_l1(base_functions, days, dollars, l1_coeff, 
 
         free_member = l1_coeff * np.sign(l2_base_funcs_coeffs[j])
         for i in range(0, len(days)):
-            free_member += dollars[i] * base_functions[j](days[i])  
+            free_member += 2 * dollars[i] * base_functions[j](days[i])  
         free_members.append(free_member)
     return np.linalg.solve(equation_matrix, free_members)        
 
@@ -188,7 +188,7 @@ def main():
     
     l2_base_functions_coeffs = (np.array(l2_base_functions_coeffs).transpose())[0]
     l1_base_functions_coeffs = compute_base_functions_coefs_by_l1(base_functions, learn_days, learn_dollars, L1_COEFF, l2_base_functions_coeffs)
-    l1_learn_dollars = np.array((learn_functional * np.matrix(l2_base_functions_coeffs).transpose()).transpose())[0]
+    l1_learn_dollars = np.array((learn_functional * np.matrix(l1_base_functions_coeffs).transpose()).transpose())[0]
     print("L1 learn error:", compute_error(learn_dollars, l1_learn_dollars))
     l1_check_dollars = np.array((check_functional * np.matrix(l1_base_functions_coeffs).transpose()).transpose())[0]
     print("L1 check error:", compute_error(check_dollars, l1_check_dollars))
